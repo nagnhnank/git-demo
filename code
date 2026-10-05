@@ -1,0 +1,236 @@
+#include<iostream>//Các lệnh cơ bản
+#include<cstdio>//In thông tin dưới dạng bảng đơn giản bằng lệnh printf
+#include<conio.h>//lấy hàm _getch() để xây dựng menu
+#include<string>//lấy kiểu dữ liệu string và các phương thức của string
+#include<random>//lấy giá trị ngẫu nhiên
+using namespace std;
+class ho {//lớp ho với các thuộc tính đề bài yêu cầu
+   public:
+   string macanho;
+   char toanha;
+   int tang;
+   double dientich;
+   int sophongngu;
+   int gia;
+   string trangthai;
+   ho() {//hàm tạo của lớp ho
+       macanho="####";
+       toanha = '#';
+       tang=0;
+       dientich=0.0;
+       sophongngu=0;
+       gia=0;
+       trangthai="khong ro";
+   }
+   ho(const ho& h) {// hàm sao chép, const nhằm ngăn các giá trị của biến cần sao chép bị sửa đổi, "ho& h" tương tự "ho *h"
+       macanho=h.macanho;
+       toanha = h.toanha;
+       tang= h.tang;
+       dientich= h.dientich;
+       sophongngu= h.sophongngu;
+       gia= h.gia;
+       trangthai=h.trangthai;
+   }
+   void nhap() {// phương thức nhập cho các đối tượng tạo từ lớp ho
+       int x;
+       cout<<"\n|ma can ho =<ten toa nha(1 chu cai)>+<so tang>+<so nha>(3->5 ki tu)|\n|VD:ten toa nha la A,ho nam tai tang thu 1, so nha 01 thi ma la A101 hoac A0101|\nNhap ma can ho:";
+       do {
+           cin>>macanho;
+       }while (macanho.length()>5||macanho.length()<3);
+       toanha=macanho[0];// tên tòa nhà là kí tự đầu
+       if (macanho.length()<5) tang=macanho[1]-'0';//trường hợp số tầng dưới 10
+       else tang=(macanho[1]-'0')*10+(macanho[2]-'0');// trường hợp số tầng từ 10 trở lên
+       cout<<"Dien tich:";cin>>dientich;
+       cout<<"So phong ngu:";cin>>sophongngu;
+       cout<<"Gia:";cin>>gia;
+       cout<<"Trang thai:\n1.Da ban\n2.Chua ban";
+       do {
+           cin>>x;
+       }while (x!=1&&x!=2);
+       if (x==1) trangthai="Da ban";
+       else trangthai="Chua ban";
+   }
+   void in() {//phương thức in thông tin của 1 đối tượng
+       printf("\n|ma can ho|toa nha|tang|dien tich|so phong ngu|%8s|trang thai|","gia");
+       printf("\n|%9s|%7c|%4d|%9.2f|%12d|%8d|%10s|",macanho.c_str(),toanha,tang,dientich,sophongngu,gia,trangthai.c_str());
+   }
+};
+class qlchungcu{//lớp quản lí chung cư gồm mảng đối tượng ds thuộc lớp ho
+   int slho;//n
+   ho ds[200];
+   public:
+   qlchungcu() {//hàm tạo của lớp qlchungcu
+       slho=0;
+       //trong hàm không cần gắn giá trị mặc định cho ds vì ds dùng class ho đã có hàm tạo sẵn
+   }
+   void datatext();//gán nhanh danh sách các hộ chung cư bằng bộ quy tắc có giá trị ngẫu nhiên
+
+
+   void nhapchungcu();//các hàm chức năng đề bài yêu cầu
+   void inchungcu();
+   void sapxep();
+   void timkiem();
+   void them();
+   void xoa();
+};
+void qlchungcu::nhapchungcu() {// hàm nhập danh sách các hộ trong chung cư
+   cout<<"Nhap so luong ho:";cin>>slho;
+   while (slho<1||slho>200) {//dùng while sau lần nhập đầu thay do-while để thông báo nhập lại chỉ hiện nếu lần đầu nhập sai
+       cout<<"Nhap lai!\nso luong ho:";cin>>slho;
+   }
+   for (int i=0;i<slho;i++) {
+       cout<<"Ho thu "<<i+1<<":";
+       ds[i].nhap();
+       if (i>0) {
+           for (int j=0;j<i;j++) {
+               while (ds[i].macanho==ds[j].macanho) {//chống lặp lại mã căn hộ
+                   cout<<"Ma can ho da ton tai!\nNhap lai toan bo thong tin!"<<endl;
+                   ds[i].nhap();
+               }
+           }
+       }
+   }
+}
+void qlchungcu::inchungcu() {//In bảng thông tin các hộ
+   printf("\n|stt|ma can ho|toa nha|tang|dien tich|so phong ngu|%8s|trang thai|","gia");
+   for (int i=0;i<slho;i++) {
+       printf("\n|%3d|%9s|%7c|%4d|%9.2f|%12d|%8d|%10s|",i+1,ds[i].macanho.c_str(),ds[i].toanha,ds[i].tang,ds[i].dientich,ds[i].sophongngu,ds[i].gia,ds[i].trangthai.c_str());
+   }
+}
+void qlchungcu::sapxep() {//sắp xếp nổi bọt(Bubble Sort)
+   ho m;
+   for (int i=0;i<slho-2;i++) {
+       for (int j=0;j<slho-1;j++) {
+           if (ds[j].dientich==ds[j+1].dientich) {
+               m=ds[j];
+               ds[j]=ds[j+1];
+               ds[j+1]=m;
+           }
+       }
+   }
+}
+void qlchungcu::timkiem() {//hàm tìm kiếm gồm 2 kiểu tìm kiếm
+   cout<<"1.Tim theo ma\n2.Tim theo trang thai\n--nhap bat ki de thoat--"<<endl;
+   int x=getch();//dùng hàm getch để lấy kí tự từ bàn phím mà không cần nhấn enter
+   string a;
+   switch (x) {
+       case 49://tìm theo mã, do mã từng hộ là độc nhất nên ngay sau khi tìm thấy và in kết qủa thì return luôn
+           cout<<"\nNhap ma ho can tim:";cin>>a;
+           while (a.length()>4) {
+               cout<<"qua dai, nhap lai!\nNhap ma ho can tim:";cin>>a;
+           }
+           for (int i=0;i<slho;i++) {
+               if (a==ds[i].macanho) {
+                   cout<<"Thong tin ho can tim:"<<endl;
+                   ds[i].in();
+                   return;;
+               }
+           }
+           cout<<"Khong tim thay can ho co ma "<<a<<endl;
+           break;
+       case 50://tìm theo trạng thái, in tất cả kết quả theo trạng thái đã chọn
+           int m,k=0;
+           cout<<"\nChon trang thai cua cac can ho:\n1.Da ban\n2.Chua ban\n"<<endl;
+           do{
+               m=getch();
+               if (m==49) a="Da ban";
+               else if (m==50) a="Chua ban";
+           }while (m!=49&&m!=50);
+           cout<<"Danh sach cac ho ";
+           if (a=="Da ban") cout<<"da ban la:"<<endl;
+           else cout<<"chua ban la:"<<endl;
+           printf("\n|stt|ma can ho|toa nha|tang|dien tich|so phong ngu|%8s|trang thai|","gia");
+           for (int i=0;i<slho;i++) {
+               if (ds[i].trangthai==a) {
+                   k++;
+                   printf("\n|%3d|%9s|%7c|%4d|%9.2f|%12d|%8d|%10s|",k,ds[i].macanho.c_str(),ds[i].toanha,ds[i].tang,ds[i].dientich,ds[i].sophongngu,ds[i].gia,ds[i].trangthai.c_str());
+               }
+           }
+           break;
+   }
+   cout<<"Da ve menu!"<<endl;
+}
+void qlchungcu::them() {//hàm thêm 1 hộ
+   if (slho==200) {//nếu số lượng hộ đã đạt tối đa(200) thì hàm ngắt ngay
+       cout<<"\nDanh sach da day, khong the them!"<<endl;
+       return;
+   }
+   int k;
+   cout<<"Nhap vi tri muon them:";cin>>k;
+   while (k<1||k>slho) {
+       cout<<"Nhap lai!"<<endl;cin>>k;
+   }
+   k--;//vị trí cần thêm bằng số thứ tự -1(stt đếm từ 1 còn vị trí trong mảng đếm từ 0)
+   for (int i=slho;i>k;i--) {//chạy từ cuối danh sách về k
+       ds[i]=ds[i-1];//truyền dữ liệu tại vị trí i vào vị trí i+1 trong mảng
+   }
+   ds[k].nhap();// nhập dữ liệu tại vị trí k của mảng
+   slho++;//sau khi thêm, số lượng hộ tăng 1
+}
+void qlchungcu::xoa() {//hàm xoa s 1 hộ
+   int k;
+   cout<<"Nhap vi tri muon xoa:";cin>>k;
+   while (k<1||k>slho) {
+       cout<<"Nhap lai!"<<endl;cin>>k;
+   }
+   k--;//tương tự, vị trí cần xóa bằng số thứ tự -1(stt đếm từ 1 còn vị trí trong mảng đếm từ 0)
+   for (int i=k;i<slho-1;i++) {//chạy từ k đến cuối danh sách
+       ds[i]=ds[i+1];//truyền dữ liệu tại vị trí i+1 vào vị trí i trong mảng
+   }
+   slho--;//sau khi xóa, số lượng hộ giảm 1
+}
+int snt(int x) {
+   for (int i=1;i<x/2+1;i++) {
+       if (x%i!=0) return 0;
+   }
+   return 1;
+}
+void qlchungcu::datatext() {//tạo đầu vào ngẫu nhiên
+   random_device rd;
+   mt19937_64 gen(rd());
+   uniform_int_distribution<> random(1000, 99999);//giá
+   uniform_int_distribution<> sl(3,20);//số lượng hộ
+   uniform_int_distribution<> r(0,9);//đối số ngẫu nhiên cho các biến còn lại
+   slho=sl(gen);
+   string a="abc";
+   string b="1234556789";
+   for (int i=0;i<slho;i++) {
+       char c=r(gen)+'0';
+       ds[i].macanho={a[r(gen)%3],b[r(gen)],c,b[r(gen)]};//tạo mã căn hộ(mặc định dưới 10 tầng)
+       if (i>0) {
+           for (int j=0;j<i;j++) {
+               while (ds[i].macanho==ds[j].macanho) {//chống lặp lại mã căn hộ
+                   ds[i].macanho={a[r(gen)%3],b[r(gen)],c,b[r(gen)]};
+               }
+           }
+       }
+       ds[i].gia=random(gen)*(random(gen)/i)+200;
+       ds[i].toanha=ds[i].macanho[0];
+       ds[i].tang=ds[i].macanho[1]-'0';
+       ds[i].dientich=i*i-(ds[i].macanho[1]-'0')+25;
+       ds[i].sophongngu=ds[i].macanho[3]-'0';
+       if (r(gen)>4) ds[i].trangthai="Da ban";
+       else ds[i].trangthai="Chua ban";
+   }
+}
+int main() {//main thiết kế dưới dạng 1 menu
+   qlchungcu n;
+   int x;
+   do {
+       cout<<"\n___MENU___\n1.Nhap danh sach\n2.In danh sach\n3.Sap xep lai danh sach\n4.Tim kiem thong tin\n5.Bo sung thong tin\n6.Xoa thong tin\n0.Dung chuong trinh"<<endl;
+       x=getch();
+       switch (x) {
+           case 98:
+               cout<<"+++TEXT+++"<<endl;
+               n.datatext();
+               break;
+           case 49:n.nhapchungcu();break;
+           case 50:n.inchungcu();break;
+           case 51:n.sapxep();break;
+           case 52:n.timkiem();break;
+           case 53:n.them();break;
+           case 54:n.xoa();break;
+           case 48:cout<<"Da dung chuong trinh!"<<endl;
+       }
+   }while (x!=48);
+}
